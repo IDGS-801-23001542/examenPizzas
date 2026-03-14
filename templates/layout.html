@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pizzería Don Cangrejo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+</head>
+
+<body class="min-h-screen text-slate-800 bg-sky-100">
+  <!-- Fondo general bubble -->
+  <div
+    class="fixed inset-0 -z-20 bg-cover bg-center bg-repeat"
+    style="background-image: url('{{ url_for('static', filename='img/pattern-bubbles.png') }}');">
+  </div>
+
+  <div class="fixed inset-0 -z-10 bg-sky-100/15"></div>
+
+  <nav
+    class="sticky top-0 z-50 border-b border-sky-900/20 shadow-xl backdrop-blur"
+    style="background-image: linear-gradient(rgba(7, 89, 133, 0.60), rgba(7, 89, 133, 0.60)), url('{{ url_for('static', filename='img/cartel2.png') }}'); background-size: cover; background-position: center;">
+    <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-6">
+      <a href="{{ url_for('pizzeria.index') }}" class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='img/logo-don-cangrejo.png') }}"
+             alt="Logo"
+             class="h-11 w-11 rounded-full border-2 border-white/60 object-cover bg-white shadow-md">
+
+        <div>
+          <p class="text-xl font-black tracking-wide text-white">Pizzería Don Cangrejo</p>
+          <p class="text-xs font-semibold text-sky-100">La mejor pizza del fondo de bikini... para ti y para mí</p>
+        </div>
+      </a>
+
+      <div class="flex flex-wrap items-center gap-3 text-sm font-bold md:text-base">
+        <a href="{{ url_for('pizzeria.index') }}"
+           class="rounded-full bg-white px-5 py-2.5 text-sky-900 shadow-md transition hover:bg-sky-50 hover:shadow-lg">
+          Pedidos
+        </a>
+
+        <a href="{{ url_for('pizzeria.ventas_dia') }}"
+           class="rounded-full bg-white px-5 py-2.5 text-sky-900 shadow-md transition hover:bg-sky-50 hover:shadow-lg">
+          Ventas por día
+        </a>
+
+        <a href="{{ url_for('pizzeria.ventas_mes') }}"
+           class="rounded-full bg-white px-5 py-2.5 text-sky-900 shadow-md transition hover:bg-sky-50 hover:shadow-lg">
+          Ventas por mes
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="mx-auto max-w-7xl px-4 py-6 lg:px-6">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mb-6 space-y-3">
+          {% for category, message in messages %}
+            <div class="rounded-2xl border px-4 py-4 shadow-sm
+              {% if category == 'success' %} bg-emerald-50 border-emerald-200 text-emerald-800 {% endif %}
+              {% if category == 'warning' %} bg-amber-50 border-amber-200 text-amber-800 {% endif %}
+              {% if category == 'danger' %} bg-rose-50 border-rose-200 text-rose-800 {% endif %}">
+              <div class="flex items-start gap-3">
+                <span class="text-lg">
+                  {% if category == 'success' %}✅{% endif %}
+                  {% if category == 'warning' %}⚠️{% endif %}
+                  {% if category == 'danger' %}⛔{% endif %}
+                </span>
+                <p class="font-medium">{{ message }}</p>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block container %}{% endblock %}
+  </main>
+</body>
+</html>

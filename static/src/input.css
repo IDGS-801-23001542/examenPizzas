@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@source "../../templates/**/*.html";
+@source "../../pizzeria/**/*.py";
+@plugin "flowbite/plugin";
+@source "../../node_modules/flowbite";

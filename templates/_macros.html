@@ -1,0 +1,33 @@
+{% macro datos(name, label, type='text', value='') %}
+<div class="mb-4">
+  <label for="{{ name }}" class="mb-2 block text-sm font-medium text-gray-900">
+    {{ label }}
+  </label>
+  <input
+    type="{{ type }}"
+    id="{{ name }}"
+    name="{{ name }}"
+    value="{{ request.form.get(name, value) }}"
+    class="block w-full rounded-2xl border border-amber-200 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+  >
+</div>
+{% endmacro %}
+
+{% macro select_simple(name, label, options, selected='') %}
+<div class="mb-4">
+  <label for="{{ name }}" class="mb-2 block text-sm font-medium text-gray-900">
+    {{ label }}
+  </label>
+  <select
+    id="{{ name }}"
+    name="{{ name }}"
+    class="block w-full rounded-2xl border border-amber-200 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+  >
+    {% for value, text in options %}
+      <option value="{{ value }}" {% if selected == value %}selected{% endif %}>
+        {{ text }}
+      </option>
+    {% endfor %}
+  </select>
+</div>
+{% endmacro %}

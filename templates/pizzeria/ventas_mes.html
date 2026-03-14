@@ -1,0 +1,116 @@
+{% extends "layout.html" %}
+{% block container %}
+
+<section class="rounded-3xl border border-white/70 bg-white/85 p-5 shadow-xl backdrop-blur">
+  <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+    <div class="flex-1">
+      <p class="text-sm font-bold uppercase tracking-wide text-emerald-700">Reporte</p>
+
+      <div class="mt-1 flex items-start justify-between gap-4">
+        <div>
+          <h2 class="text-3xl font-black text-slate-800">Consulta de ventas por mes</h2>
+          <p class="mt-1 text-slate-500">Filtra pedidos por mes y año.</p>
+        </div>
+
+        <img src="{{ url_for('static', filename='img/ventaspormes.png') }}"
+             alt="Ventas por mes"
+             class="h-16 w-auto rounded-xl object-cover shadow-md md:h-20">
+      </div>
+    </div>
+  </div>
+
+  <form method="POST" class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3 md:items-end">
+    {{ form.hidden_tag() }}
+
+    <div>
+      <label class="mb-2 block text-sm font-semibold text-slate-700">Mes</label>
+      <select name="mes" class="w-full rounded-2xl border border-amber-200 bg-white px-4 py-3 shadow-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+        <option value="">Seleccione</option>
+        <option value="1" {% if filtros.mes == '1' %}selected{% endif %}>Enero</option>
+        <option value="2" {% if filtros.mes == '2' %}selected{% endif %}>Febrero</option>
+        <option value="3" {% if filtros.mes == '3' %}selected{% endif %}>Marzo</option>
+        <option value="4" {% if filtros.mes == '4' %}selected{% endif %}>Abril</option>
+        <option value="5" {% if filtros.mes == '5' %}selected{% endif %}>Mayo</option>
+        <option value="6" {% if filtros.mes == '6' %}selected{% endif %}>Junio</option>
+        <option value="7" {% if filtros.mes == '7' %}selected{% endif %}>Julio</option>
+        <option value="8" {% if filtros.mes == '8' %}selected{% endif %}>Agosto</option>
+        <option value="9" {% if filtros.mes == '9' %}selected{% endif %}>Septiembre</option>
+        <option value="10" {% if filtros.mes == '10' %}selected{% endif %}>Octubre</option>
+        <option value="11" {% if filtros.mes == '11' %}selected{% endif %}>Noviembre</option>
+        <option value="12" {% if filtros.mes == '12' %}selected{% endif %}>Diciembre</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="mb-2 block text-sm font-semibold text-slate-700">Año</label>
+      <select name="anio" class="w-full rounded-2xl border border-amber-200 bg-white px-4 py-3 shadow-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+        <option value="">Seleccione</option>
+        {% for i in range(2024, 2031) %}
+          <option value="{{ i }}" {% if filtros.anio == i|string %}selected{% endif %}>{{ i }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <button type="submit" class="w-full rounded-2xl bg-sky-700 px-4 py-3 font-black text-white shadow-lg transition hover:bg-sky-800">
+        Consultar
+      </button>
+    </div>
+  </form>
+</section>
+
+<section class="mt-6 rounded-3xl border border-white/70 bg-white/85 p-5 shadow-xl backdrop-blur">
+  <div class="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div>
+      <h3 class="text-2xl font-black text-slate-800">Resultados {% if resumen %}<span class="text-emerald-700">- {{ resumen }}</span>{% endif %}</h3>
+      <p class="text-sm text-slate-500">Pedidos registrados en el periodo seleccionado.</p>
+    </div>
+
+    <div class="rounded-2xl bg-amber-50 px-4 py-3 ring-1 ring-amber-200">
+      <p class="text-sm font-semibold text-slate-500">Total acumulado</p>
+      <p class="text-2xl font-black text-amber-700">${{ "%.2f"|format(total) }}</p>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto rounded-2xl border border-slate-200">
+    <table class="min-w-full text-sm">
+      <thead class="bg-slate-100 text-slate-700">
+        <tr>
+          <th class="px-4 py-3 text-left font-bold">Pedido</th>
+          <th class="px-4 py-3 text-left font-bold">Cliente</th>
+          <th class="px-4 py-3 text-left font-bold">Fecha</th>
+          <th class="px-4 py-3 text-left font-bold">Teléfono</th>
+          <th class="px-4 py-3 text-left font-bold">Total</th>
+          <th class="px-4 py-3 text-left font-bold">Detalle</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-200 bg-white">
+        {% for p in resultados %}
+        <tr class="hover:bg-amber-50/40">
+          <td class="px-4 py-3 font-semibold">#{{ p.id_pedido }}</td>
+          <td class="px-4 py-3">{{ p.cliente.nombre }}</td>
+          <td class="px-4 py-3">{{ p.fecha.strftime('%d/%m/%Y') }}</td>
+          <td class="px-4 py-3">{{ p.cliente.telefono }}</td>
+          <td class="px-4 py-3 font-bold text-emerald-700">${{ "%.2f"|format(p.total|float) }}</td>
+          <td class="px-4 py-3">
+            <a href="{{ url_for('pizzeria.detalle_venta') }}?id={{ p.id_pedido }}&volver=pizzeria.ventas_mes"
+               class="font-bold text-emerald-700 hover:underline">
+              Ver detalle
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+
+        {% if resultados|length == 0 %}
+        <tr>
+          <td colspan="6" class="px-4 py-10 text-center text-slate-500">
+            Sin resultados.
+          </td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% endblock %}

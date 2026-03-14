@@ -1,0 +1,305 @@
+{% extends "layout.html" %}
+{% block container %}
+
+<section
+  class="relative overflow-hidden rounded-3xl border border-white/70 shadow-xl"
+  style="background-image: linear-gradient(rgba(255,255,255,0.18), rgba(255,255,255,0.18)), url('{{ url_for('static', filename='img/cartel.png') }}'); background-size: cover; background-position: center;">
+  <div class="grid items-center gap-6 px-6 py-8 lg:grid-cols-2 lg:px-8 lg:py-10">
+    <div class="rounded-3xl bg-white/45 p-6 backdrop-blur-sm">
+      <h1 class="text-3xl font-black leading-tight text-slate-900 md:text-4xl">
+        La pizza de Don Cangrejo,
+        <span class="text-emerald-700">es la mejor para ti y para mii</span>
+      </h1>
+      <p class="mt-3 max-w-xl text-base font-semibold text-slate-700">
+        tuturutrtu pizza wieegurtutu pizza.
+      </p>
+    </div>
+
+    <div class="flex justify-center lg:justify-end">
+      <img src="{{ url_for('static', filename='img/hero-pizza.png') }}"
+           alt="Pizza temática"
+           class="max-h-[190px] rounded-3xl bg-white/20 p-2 drop-shadow-2xl md:max-h-[230px]">
+    </div>
+  </div>
+</section>
+
+<form method="POST" action="{{ url_for('pizzeria.index') }}" class="mt-6" autocomplete="off">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div class="grid grid-cols-1 items-start gap-6 xl:grid-cols-3">
+
+    <!-- COLUMNA IZQUIERDA: DATOS + DETALLE -->
+    <div class="space-y-6">
+
+      <!-- DATOS CLIENTE -->
+      <section class="rounded-3xl border border-white/70 bg-white/85 p-6 shadow-xl backdrop-blur">
+        <div class="mb-4 flex items-center gap-3">
+          <img src="{{ url_for('static', filename='img/datos.png') }}"
+               alt="Datos del cliente"
+               class="h-9 w-9 rounded-xl object-cover shadow-sm">
+          <div>
+            <h2 class="text-lg font-black text-slate-800">Datos del cliente</h2>
+            <p class="text-sm text-slate-500">Información del pedido.</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-slate-700">Nombre</label>
+            <input type="text"
+                   name="nombre"
+                   value="{{ datos_cliente.get('nombre', '') }}"
+                   autocomplete="off"
+                   class="w-full rounded-2xl border border-amber-200 bg-white px-4 py-3 shadow-sm outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-slate-700">Dirección</label>
+            <input type="text"
+                   name="direccion"
+                   value="{{ datos_cliente.get('direccion', '') }}"
+                   autocomplete="off"
+                   class="w-full rounded-2xl border border-amber-200 bg-white px-4 py-3 shadow-sm outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-slate-700">Teléfono</label>
+            <input type="text"
+                   name="telefono"
+                   value="{{ datos_cliente.get('telefono', '') }}"
+                   autocomplete="off"
+                   class="w-full rounded-2xl border border-amber-200 bg-white px-4 py-3 shadow-sm outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-slate-700">Fecha del pedido</label>
+            <input type="date"
+                   name="fecha"
+                   value="{{ datos_cliente.get('fecha', '') }}"
+                   class="w-full rounded-2xl border border-amber-200 bg-white px-4 py-3 shadow-sm outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+          </div>
+        </div>
+      </section>
+
+      <!-- DETALLE DEL PEDIDO -->
+      <section class="rounded-3xl border border-white/70 bg-white/85 p-5 shadow-xl backdrop-blur">
+        <div class="mb-4 flex flex-col gap-3">
+          <div>
+            <h3 class="text-xl font-black text-slate-800">Detalle del pedido</h3>
+            <p class="text-sm text-slate-500">Aquí se van armando las pizzas del cliente.</p>
+          </div>
+
+          <div class="rounded-2xl bg-amber-50 px-4 py-3 ring-1 ring-amber-200">
+            <span class="text-sm font-semibold text-slate-500">Total actual</span>
+            <p class="text-2xl font-black text-amber-700">${{ "%.2f"|format(total) }}</p>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 overflow-hidden">
+          <table class="w-full table-fixed text-xs">
+            <thead class="bg-slate-100 text-slate-700">
+              <tr>
+                <th class="w-[18%] px-2 py-2 text-left font-bold">Tamaño</th>
+                <th class="w-[30%] px-2 py-2 text-left font-bold">Ingredientes</th>
+                <th class="w-[16%] px-2 py-2 text-left font-bold">Cant.</th>
+                <th class="w-[18%] px-2 py-2 text-left font-bold">Subtotal</th>
+                <th class="w-[18%] px-2 py-2 text-center font-bold">Acción</th>
+              </tr>
+            </thead>
+
+            <tbody class="divide-y divide-slate-200 bg-white">
+              {% for item in detalle %}
+              <tr class="hover:bg-amber-50/50 align-top">
+                <td class="px-2 py-2 font-semibold break-words">{{ item.tamano }}</td>
+                <td class="px-2 py-2 break-words leading-snug">{{ item.ingredientes }}</td>
+                <td class="px-2 py-2 text-center">{{ item.numero_pizzas }}</td>
+                <td class="px-2 py-2 font-bold text-emerald-700 break-words">
+                  ${{ "%.2f"|format(item.subtotal) }}
+                </td>
+                <td class="px-2 py-2 text-center">
+                  <button type="submit"
+                          name="accion"
+                          value="quitar"
+                          formaction="{{ url_for('pizzeria.index') }}"
+                          formmethod="POST"
+                          onclick="document.getElementById('index-quitar').value='{{ loop.index0 }}';"
+                          class="rounded-lg bg-rose-600 px-2 py-1 text-xs font-bold text-white transition hover:bg-rose-700">
+                    Quitar
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+
+              {% if detalle|length == 0 %}
+              <tr>
+                <td colspan="5" class="px-3 py-8 text-center text-slate-500">
+                  No hay pizzas agregadas.
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+
+        <input type="hidden" name="index" id="index-quitar">
+
+        <div class="mt-5 flex flex-col gap-4">
+          <div class="text-lg font-black text-slate-800">
+            Total del pedido: <span class="text-emerald-700">${{ "%.2f"|format(total) }}</span>
+          </div>
+
+          <button type="submit" name="accion" value="terminar"
+                  class="w-full rounded-2xl bg-amber-500 px-6 py-3 font-black text-slate-900 shadow-lg transition hover:bg-amber-400">
+            Terminar
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- COLUMNA CENTRO: ARMA TU PIZZA -->
+    <section class="rounded-3xl border border-white/70 bg-white/85 p-6 shadow-xl backdrop-blur">
+      <div class="mb-4 flex items-center gap-3">
+        <img src="{{ url_for('static', filename='img/armapizza.png') }}"
+             alt="Arma tu pizza"
+             class="h-9 w-9 rounded-xl object-cover shadow-sm">
+        <div>
+          <h2 class="text-lg font-black text-slate-800">Arma tu pizza</h2>
+          <p class="text-sm text-slate-500">Tamaño, ingredientes y cantidad.</p>
+        </div>
+      </div>
+
+      <div class="space-y-5">
+        <div>
+          <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-slate-500">Tamaño</h3>
+          <div class="grid gap-3">
+            <label class="flex cursor-pointer items-center justify-between rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 transition hover:shadow-md">
+              <div class="flex items-center gap-3">
+                <input type="radio" name="tamano" value="Chica" class="h-4 w-4">
+                <span class="font-bold text-slate-800">Chica</span>
+              </div>
+              <span class="rounded-full bg-white px-3 py-1 font-black text-amber-700 shadow">$40</span>
+            </label>
+
+            <label class="flex cursor-pointer items-center justify-between rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 transition hover:shadow-md">
+              <div class="flex items-center gap-3">
+                <input type="radio" name="tamano" value="Mediana" class="h-4 w-4">
+                <span class="font-bold text-slate-800">Mediana</span>
+              </div>
+              <span class="rounded-full bg-white px-3 py-1 font-black text-amber-700 shadow">$80</span>
+            </label>
+
+            <label class="flex cursor-pointer items-center justify-between rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 transition hover:shadow-md">
+              <div class="flex items-center gap-3">
+                <input type="radio" name="tamano" value="Grande" class="h-4 w-4">
+                <span class="font-bold text-slate-800">Grande</span>
+              </div>
+              <span class="rounded-full bg-white px-3 py-1 font-black text-amber-700 shadow">$120</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-slate-500">Ingredientes</h3>
+          <div class="grid gap-3">
+            <label class="flex cursor-pointer items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 transition hover:shadow-md">
+              <div class="flex items-center gap-3">
+                <input type="checkbox" name="ingredientes" value="Jamón" class="h-4 w-4">
+                <span class="font-semibold text-slate-800">Jamón</span>
+              </div>
+              <span class="rounded-full bg-white px-3 py-1 text-sm font-black text-emerald-700 shadow">$10</span>
+            </label>
+
+            <label class="flex cursor-pointer items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 transition hover:shadow-md">
+              <div class="flex items-center gap-3">
+                <input type="checkbox" name="ingredientes" value="Piña" class="h-4 w-4">
+                <span class="font-semibold text-slate-800">Piña</span>
+              </div>
+              <span class="rounded-full bg-white px-3 py-1 text-sm font-black text-emerald-700 shadow">$10</span>
+            </label>
+
+            <label class="flex cursor-pointer items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 transition hover:shadow-md">
+              <div class="flex items-center gap-3">
+                <input type="checkbox" name="ingredientes" value="Champiñones" class="h-4 w-4">
+                <span class="font-semibold text-slate-800">Champiñones</span>
+              </div>
+              <span class="rounded-full bg-white px-3 py-1 text-sm font-black text-emerald-700 shadow">$10</span>
+            </label>
+          </div>
+
+          <p class="mt-2 text-xs text-slate-500">
+            Puedes seleccionar los ingredientes que quieras.
+          </p>
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-slate-700">Número de pizzas</label>
+          <input type="number"
+                 name="numero_pizzas"
+                 min="1"
+                 autocomplete="off"
+                 class="w-full rounded-2xl border border-amber-200 bg-white px-4 py-3 shadow-sm outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+        </div>
+
+        <button type="submit" name="accion" value="agregar"
+                class="w-full rounded-2xl bg-sky-700 px-6 py-3 font-black text-white shadow-lg transition hover:bg-sky-800">
+          Agregar al pedido
+        </button>
+      </div>
+    </section>
+
+    <!-- COLUMNA DERECHA: VENTAS DEL DÍA -->
+    <section class="rounded-3xl border border-sky-800/20 bg-[linear-gradient(180deg,#0369a1_0%,#0ea5e9_100%)] p-5 text-white shadow-2xl self-start">
+      <div class="mb-4 flex items-center gap-3">
+        <img src="{{ url_for('static', filename='img/coin.png') }}"
+             alt="Ventas del día"
+             class="h-9 w-9 rounded-xl object-cover bg-white/10 shadow-sm">
+        <div>
+          <h2 class="text-lg font-black">Ventas del día</h2>
+          <p class="text-sm text-sky-100">Ventas registradas hoy.</p>
+        </div>
+      </div>
+
+      <div class="space-y-4 max-h-[320px] overflow-y-auto pr-2">
+        {% for venta in ventas_hoy %}
+          <div class="rounded-2xl border border-white/10 bg-white/10 p-4">
+            <p class="text-sm text-sky-100">Cliente</p>
+            <p class="font-bold text-white">
+              {{ venta.cliente.nombre }}
+            </p>
+
+            <p class="mt-3 text-sm text-sky-100">Venta</p>
+            <p class="text-lg font-black">
+              ${{ "%.2f"|format(venta.total|float) }}
+            </p>
+
+            <a href="{{ url_for('pizzeria.detalle_venta', id=venta.id_pedido, volver='pizzeria.index') }}"
+               class="mt-3 inline-block rounded-xl bg-white px-4 py-2 text-sm font-black text-sky-800 shadow transition hover:bg-sky-50">
+              Ver detalles
+            </a>
+          </div>
+        {% endfor %}
+
+        {% if ventas_hoy|length == 0 %}
+          <div class="rounded-2xl border border-dashed border-white/20 bg-white/5 p-5 text-sky-100">
+            No hay ventas registradas hoy.
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="mt-5 rounded-2xl bg-white/10 p-4 shadow-inner">
+        <p class="text-sm text-sky-100">Total del día</p>
+        <h3 class="mt-1 text-3xl font-black">${{ "%.2f"|format(total_hoy) }}</h3>
+      </div>
+
+      <div class="mt-5">
+        <a href="{{ url_for('pizzeria.ventas_dia') }}"
+           class="block rounded-2xl bg-white px-4 py-3 text-center font-black text-sky-800 shadow transition hover:bg-sky-50">
+          Ventas totales por día
+        </a>
+      </div>
+    </section>
+
+  </div>
+</form>
+
+{% endblock %}
